@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'http://localhost:8080';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const token = () => localStorage.getItem('token');
 const auth  = () => ({ headers: { Authorization: `Bearer ${token()}` } });
