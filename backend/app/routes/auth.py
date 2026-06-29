@@ -94,27 +94,45 @@ async def login(data: LoginRequest) -> LoginResponse:
     # the user session inside it, causing all subsequent table() queries to
     # send the user's JWT instead of the service-role key, which makes RLS
     # filter rows to only that user's data. Direct HTTP avoids this entirely.
-    supabase_url = os.environ["SUPABASE_URL"].rstrip("/")
-    anon_key = os.environ["SUPABASE_ANON_KEY"]
+    print("=" * 60)
+    print(f"[LOGIN] Request for: {data.email}")
+
+    supabase_url = os.environ.get("SUPABASE_URL", "").strip().rstrip("/")
+    anon_key = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+
+    print(f"[LOGIN] SUPABASE_URL present: {bool(supabase_url)} — prefix: {supabase_url[:40] if supabase_url else 'MISSING'}")
+    print(f"[LOGIN] SUPABASE_ANON_KEY present: {bool(anon_key)} — length: {len(anon_key)}")
+
+    if not supabase_url or not anon_key:
+        print("[LOGIN] FATAL: one or more required env vars are empty")
+        raise HTTPException(status_code=500, detail="Server configuration error: missing env vars")
 
     try:
-        async with httpx.AsyncClient(timeout=10) as http:
+        auth_url = f"{supabase_url}/auth/v1/token?grant_type=password"
+        print(f"[LOGIN] POSTing to: {auth_url}")
+        async with httpx.AsyncClient(timeout=15) as http:
             resp = await http.post(
-                f"{supabase_url}/auth/v1/token?grant_type=password",
+                auth_url,
                 headers={"apikey": anon_key, "Content-Type": "application/json"},
                 json={"email": data.email, "password": data.password},
             )
+            print(f"[LOGIN] Supabase response status: {resp.status_code}")
             resp.raise_for_status()
             auth_data: dict = resp.json()
+            print(f"[LOGIN] access_token length: {len(auth_data.get('access_token', ''))}")
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
+        print(f"[LOGIN] HTTPStatusError {status}: {exc.response.text}")
         logger.error("Login HTTP error %s: %s", status, exc.response.text)
         if status in (400, 401):
             raise HTTPException(status_code=401, detail="Invalid email or password")
-        raise HTTPException(status_code=500, detail="Login failed")
+        raise HTTPException(status_code=500, detail=f"Login failed: Supabase returned {status}")
     except Exception as exc:
-        logger.error("Login failed: %s", exc)
-        raise HTTPException(status_code=500, detail="Login failed")
+        print(f"[LOGIN] EXCEPTION type : {type(exc).__name__}")
+        print(f"[LOGIN] EXCEPTION msg  : {exc}")
+        traceback.print_exc()
+        logger.error("Login failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Login failed: {type(exc).__name__}: {exc}")
 
     access_token: str = auth_data.get("access_token", "")
     user_obj: dict = auth_data.get("user", {})
