@@ -20,3 +20,4 @@ export const createTodo     = (title, description)=> axios.post(T, { title, desc
 export const updateTodo     = (id, data)          => axios.patch(`${API}/todos/${id}`, data, auth());
 export const toggleComplete = (id)                => axios.patch(`${API}/todos/${id}/complete`, {}, auth());
 export const deleteTodo     = (id)                => axios.delete(`${API}/todos/${id}`, auth());
+export const summarizeTodos = ()                  => axios.post(`${API}/todos/summarize`, {}, auth());

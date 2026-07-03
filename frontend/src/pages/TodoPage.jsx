@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
-import { getAllTodos, createTodo, toggleComplete, deleteTodo } from '../api';
+import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
 
 export default function TodoPage() {
-  const [todos,   setTodos]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [todos,          setTodos]          = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState(null);
+  const [summary,        setSummary]        = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError,   setSummaryError]   = useState(null);
+  const [showSummary,    setShowSummary]    = useState(false);
   const navigate = useNavigate();
 
   const username = localStorage.getItem('username') || 'there';
@@ -53,6 +57,27 @@ export default function TodoPage() {
     setTodos(prev => prev.filter(t => t.id !== id));
   };
 
+  const handleSummarize = async () => {
+    setSummaryLoading(true);
+    setSummaryError(null);
+    setSummary(null);
+    setShowSummary(true);
+    try {
+      const { data } = await summarizeTodos();
+      setSummary(data.summary);
+    } catch {
+      setSummaryError('Could not generate summary. Try again!');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  const closeSummary = () => {
+    setShowSummary(false);
+    setSummary(null);
+    setSummaryError(null);
+  };
+
   const completedCount = todos.filter(t => t.is_completed).length;
 
   return (
@@ -80,6 +105,41 @@ export default function TodoPage() {
             <span className="stats-done">{completedCount} completed</span>
             <span className="stats-dot">·</span>
             <span className="stats-todo">{todos.length - completedCount} pending</span>
+          </div>
+        )}
+
+        <div className="summarize-wrap">
+          <button
+            className="btn btn-ai"
+            onClick={handleSummarize}
+            disabled={summaryLoading || todos.length === 0}
+          >
+            {summaryLoading ? (
+              <>
+                <span className="spinner-inline" />
+                AI is analyzing your todos…
+              </>
+            ) : (
+              '✨ Summarize My Todos'
+            )}
+          </button>
+        </div>
+
+        {showSummary && (
+          <div className="ai-summary-card">
+            <div className="ai-summary-header">
+              <span className="ai-summary-title">✨ AI Summary</span>
+              <button className="ai-summary-close" onClick={closeSummary} aria-label="Close summary">
+                ✕
+              </button>
+            </div>
+            {summaryLoading ? (
+              <p className="ai-summary-text">AI is analyzing your todos…</p>
+            ) : summaryError ? (
+              <p className="ai-summary-error">{summaryError}</p>
+            ) : (
+              <p className="ai-summary-text">{summary}</p>
+            )}
           </div>
         )}
 
