@@ -23,3 +23,7 @@ class TodoResponse(BaseModel):
     is_completed: bool
     created_at: datetime
     updated_at: datetime
+
+
+class SummarizeResponse(BaseModel):
+    summary: str

@@ -3,8 +3,9 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.middleware.auth_middleware import get_current_user
-from app.models.todo_model import TodoCreate, TodoResponse, TodoUpdate
+from app.models.todo_model import SummarizeResponse, TodoCreate, TodoResponse, TodoUpdate
 from app.models.user_model import CurrentUser
+from app.services.ai_service import ai_service
 from app.services.todo_service import todo_service
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,27 @@ async def create_todo(
     except Exception as exc:
         logger.error("Failed to create todo: %s", exc)
         raise HTTPException(status_code=500, detail="Failed to create todo")
+
+
+@router.post(
+    "/summarize",
+    response_model=SummarizeResponse,
+    summary="AI todo summary",
+    description="Uses Gemini AI to summarize all todos for the authenticated user.",
+)
+async def summarize_todos(
+    current_user: CurrentUser = Depends(get_current_user),
+) -> SummarizeResponse:
+    try:
+        todos = await todo_service.list_user_todos(current_user.id)
+        summary = await ai_service.summarize_todos(todos)
+        return SummarizeResponse(summary=summary)
+    except RuntimeError as exc:
+        logger.error("AI service error: %s", exc)
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Failed to summarize todos: %s", exc)
+        raise HTTPException(status_code=500, detail="Could not generate summary. Try again!")
 
 
 @router.get(
