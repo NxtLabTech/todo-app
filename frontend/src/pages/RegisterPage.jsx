@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
+import PasswordInput from '../components/PasswordInput';
 
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
@@ -129,9 +130,8 @@ export default function RegisterPage() {
           {/* Password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-password">Password</label>
-            <input
+            <PasswordInput
               id="reg-password"
-              type="password"
               className={`field-input ${errors.password ? 'field-input--err' : ''}`}
               placeholder="Create a strong password"
               value={password}
@@ -179,9 +179,8 @@ export default function RegisterPage() {
           {/* Confirm password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-confirm">Confirm password</label>
-            <input
+            <PasswordInput
               id="reg-confirm"
-              type="password"
               className={`field-input ${errors.confirm ? 'field-input--err' : ''}`}
               placeholder="Re-enter your password"
               value={confirm}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../api';
+import PasswordInput from '../components/PasswordInput';
 
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
@@ -82,9 +83,8 @@ export default function LoginPage() {
 
           <div className="field-group">
             <label className="field-label" htmlFor="login-password">Password</label>
-            <input
+            <PasswordInput
               id="login-password"
-              type="password"
               className={`field-input ${errors.password ? 'field-input--err' : ''}`}
               placeholder="Minimum 8 characters"
               value={password}

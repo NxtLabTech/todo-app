@@ -462,6 +462,31 @@
 .field-input:disabled     { background: #f9fafb; cursor: not-allowed; }
 .field-input::placeholder { color: #9ca3af; }
 
+/* ─── Password visibility toggle ─────────────────────────── */
+.password-field        { position: relative; }
+.password-field-input  { padding-right: 44px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.password-toggle:hover:not(:disabled) { color: var(--green); background: var(--green-light); }
+.password-toggle:focus-visible        { outline: 2px solid var(--green); outline-offset: 1px; }
+.password-toggle:disabled             { cursor: not-allowed; opacity: .5; }
+
 .field-error {
   font-size: 12.5px;
   color: var(--danger);
