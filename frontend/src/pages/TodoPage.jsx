@@ -12,6 +12,7 @@ export default function TodoPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError,   setSummaryError]   = useState(null);
   const [showSummary,    setShowSummary]    = useState(false);
+  const [deletingId,     setDeletingId]     = useState(null);
   const navigate = useNavigate();
 
   const username = localStorage.getItem('username') || 'there';
@@ -52,16 +53,24 @@ export default function TodoPage() {
     setTodos(prev => prev.map(t => t.id === id ? data : t));
   };
 
-  const handleDelete = async (id) => {
-  const confirmed = window.confirm('Are you sure you want to delete this todo?');
-  if (!confirmed) return;
+  const handleRequestDelete = (id) => {
+    setDeletingId(id);
+  };
+  
+  const confirmDelete = async () => {
+    if (!deletingId) return;
+    try {
+      await deleteTodo(deletingId);
+      setTodos(prev => prev.filter(t => t.id !== deletingId));
+    } catch (err) {
+      console.error("Failed to delete todo:", err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
-  try {
-    await deleteTodo(id);
-    setTodos(prev => prev.filter(t => t.id !== id));
-  } catch (err) {
-    console.error('Failed to delete todo:', err);
-  }
+const cancelDelete = () => {
+  setDeletingId(null);
 };
 
   const handleSummarize = async () => {
@@ -179,11 +188,39 @@ export default function TodoPage() {
                 <TodoCard
                   todo={todo}
                   onToggle={handleToggle}
-                  onDelete={handleDelete}
+                  onDelete={handleRequestDelete}
                 />
               </li>
             ))}
           </ul>
+        )}
+        {deletingId && (
+          <div className="modal-overlay" style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', zIndex: 1000
+          }}>
+            <div className="modal-content" style={{
+              backgroundColor: '#fff', padding: '24px', borderRadius: '8px',
+              maxWidth: '400px', width: '90%', textAlign: 'center'
+            }}>
+              <h3>Are you sure you want to delete this todo?</h3>
+              <div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button
+                  onClick={confirmDelete}
+                  style={{ backgroundColor: '#dc2626', color: '#fff', padding: '8px 16px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
+                >
+                  Yes, Delete
+                </button>
+                <button
+                  onClick={cancelDelete}
+                  style={{ backgroundColor: '#6b7280', color: '#fff', padding: '8px 16px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
