@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { sanitizeInput } from '../utils/helpers';
 
 export default function TodoForm({ onSubmit }) {
   const [title,       setTitle]       = useState('');
@@ -8,14 +9,17 @@ export default function TodoForm({ onSubmit }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim()) {
-      setError('Title is required.');
+    const cleanTitle = sanitizeInput(title);
+    const cleanDescription = sanitizeInput(description);
+
+    if (!cleanTitle) {
+      setError('Title is required and cannot be empty.');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await onSubmit(title.trim(), description.trim());
+      await onSubmit(cleanTitle, cleanDescription);
       setTitle('');
       setDescription('');
     } catch {
@@ -24,6 +28,7 @@ export default function TodoForm({ onSubmit }) {
       setLoading(false);
     }
   };
+
 
   return (
     <form className="todo-form" onSubmit={handleSubmit}>

@@ -40,10 +40,11 @@ app = FastAPI(
 allowed_origins: list[str] = [
     o.strip()
     for o in os.environ.get(
-        "ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173"
+        "ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173,http://localhost:5174"
     ).split(",")
     if o.strip()
 ]
+
 print(f"[CORS] Allowed origins ({len(allowed_origins)}): {allowed_origins}")
 
 app.add_middleware(

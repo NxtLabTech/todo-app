@@ -13,3 +13,11 @@ export function getErrorMessage(error) {
   if (Array.isArray(detail)) return detail.map((d) => d.msg).join(', ');
   return 'Something went wrong. Please try again.';
 }
+
+// Strip HTML tags from string to prevent XSS
+export function sanitizeInput(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/<[^>]*>/g, '').trim();
+}
+
+
