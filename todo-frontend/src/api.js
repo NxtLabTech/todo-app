@@ -12,6 +12,10 @@ export const loginUser    = (email, password)            =>
 export const registerUser = (username, email, password)  =>
   axios.post(`${API}/auth/register`, { full_name: username, email, password });
 
+// ── System ────────────────────────────────────────────────────
+export const checkHealth  = ()                           =>
+  axios.get(`${API}/health`).catch(() => {});
+
 // ── Todos (all require JWT) ───────────────────────────────────
 const T = `${API}/todos/`;
 
@@ -21,3 +25,5 @@ export const updateTodo     = (id, data)          => axios.patch(`${API}/todos/$
 export const toggleComplete = (id)                => axios.patch(`${API}/todos/${id}/complete`, {}, auth());
 export const deleteTodo     = (id)                => axios.delete(`${API}/todos/${id}`, auth());
 export const summarizeTodos = ()                  => axios.post(`${API}/todos/summarize`, {}, auth());
+
+

@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage    from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TodoPage     from './pages/TodoPage';
+import { checkHealth } from './api';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -11,6 +13,11 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    checkHealth();
+  }, []);
+
+
   return (
     <BrowserRouter>
       <Routes>
@@ -26,3 +33,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
