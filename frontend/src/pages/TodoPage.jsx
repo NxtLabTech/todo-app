@@ -53,9 +53,16 @@ export default function TodoPage() {
   };
 
   const handleDelete = async (id) => {
+  const confirmed = window.confirm('Are you sure you want to delete this todo?');
+  if (!confirmed) return;
+
+  try {
     await deleteTodo(id);
     setTodos(prev => prev.filter(t => t.id !== id));
-  };
+  } catch (err) {
+    console.error('Failed to delete todo:', err);
+  }
+};
 
   const handleSummarize = async () => {
     setSummaryLoading(true);
