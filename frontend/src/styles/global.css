@@ -229,3 +229,115 @@ input {
   font-weight: 600;
   color: var(--text);
 }
+
+
+/* Todo Dashboard Statistics */
+.todo-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.todo-stat-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.todo-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.todo-stat-label {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.todo-stat-value {
+  color: var(--primary);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.todo-stat-completed .todo-stat-value {
+  color: var(--success);
+}
+
+.todo-stat-pending .todo-stat-value {
+  color: #d97706;
+}
+
+.todo-progress-card {
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.todo-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.todo-progress-header strong {
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.todo-progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.todo-progress-fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  .todo-stat-cards {
+    gap: 10px;
+  }
+
+  .todo-stat-card {
+    padding: 14px 10px;
+  }
+
+  .todo-stat-label {
+    font-size: 12px;
+  }
+
+  .todo-stat-value {
+    font-size: 24px;
+  }
+
+  .todo-progress-card {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-progress-fill {
+    transition: none;
+  }
+}

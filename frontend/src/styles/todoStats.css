@@ -1,0 +1,122 @@
+
+.todo-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+.todo-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.todo-stat-card,
+.todo-progress-card {
+  min-width: 0;
+  padding: 20px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 10px);
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.todo-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-stat-label {
+  color: var(--text-muted, #64748b);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.todo-stat-number {
+  color: var(--primary, #2563eb);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.todo-stat-completed .todo-stat-number {
+  color: var(--success, #16a34a);
+}
+
+.todo-stat-pending .todo-stat-number {
+  color: #d97706;
+}
+
+.todo-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--text, #1e293b);
+  font-size: 14px;
+}
+
+.todo-progress-heading strong {
+  color: var(--primary, #2563eb);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.todo-progress-track {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  background: var(--border, #e2e8f0);
+  border-radius: 999px;
+}
+
+.todo-progress-fill {
+  height: 100%;
+  background: var(--success, #16a34a);
+  border-radius: inherit;
+  transition: width 250ms ease;
+}
+
+@media (max-width: 600px) {
+  .todo-stats {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .todo-stats-grid {
+    gap: 10px;
+  }
+
+  .todo-stat-card {
+    padding: 14px 12px;
+  }
+
+  .todo-stat-label {
+    font-size: 12px;
+  }
+
+  .todo-stat-number {
+    font-size: 23px;
+  }
+
+  .todo-progress-card {
+    padding: 16px;
+  }
+
+  .todo-progress-heading {
+    font-size: 13px;
+  }
+
+  .todo-progress-heading strong {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-progress-fill {
+    transition: none;
+  }
+}
