@@ -9,6 +9,9 @@ from app.services.supabase_service import supabase_service
 logger = logging.getLogger(__name__)
 
 
+PRIORITY_ORDER: dict[str, int] = {"high": 0, "medium": 1, "low": 2}
+
+
 class TodoService:
     async def list_user_todos(self, user_id: str) -> list[dict[str, Any]]:
         def _query() -> Any:
@@ -21,7 +24,10 @@ class TodoService:
             )
 
         result = await asyncio.to_thread(_query)
-        return result.data or []
+        todos: list[dict[str, Any]] = result.data or []
+        # Stable sort: high -> medium -> low, newest first within a priority.
+        todos.sort(key=lambda t: PRIORITY_ORDER.get(t.get("priority") or "medium", 1))
+        return todos
 
     async def get_todo(self, todo_id: str) -> Optional[dict[str, Any]]:
         def _query() -> Any:
@@ -46,6 +52,7 @@ class TodoService:
                     {
                         "title": data.title,
                         "description": data.description,
+                        "priority": data.priority,
                         "is_completed": False,
                         "user_id": user_id,
                         "created_at": now,

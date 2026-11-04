@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { PRIORITIES } from '../utils/priority';
 
 export default function TodoForm({ onSubmit }) {
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
+  const [priority,    setPriority]    = useState('medium');
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState('');
 
@@ -15,9 +17,10 @@ export default function TodoForm({ onSubmit }) {
     setError('');
     setLoading(true);
     try {
-      await onSubmit(title.trim(), description.trim());
+      await onSubmit(title.trim(), description.trim(), priority);
       setTitle('');
       setDescription('');
+      setPriority('medium');
     } catch {
       setError('Failed to add todo. Please try again.');
     } finally {
@@ -53,6 +56,17 @@ export default function TodoForm({ onSubmit }) {
           disabled={loading}
           maxLength={1000}
         />
+        <select
+          className="form-input"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          disabled={loading}
+          aria-label="Priority"
+        >
+          {PRIORITIES.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
         <button className="form-submit" type="submit" disabled={loading}>
           {loading ? 'Adding…' : '+ Add Todo'}
         </button>

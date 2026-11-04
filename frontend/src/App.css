@@ -575,3 +575,54 @@
   .todo-form     { padding: 18px; }
   .auth-card     { padding: 28px 20px; }
 }
+
+/* ─── Priority ───────────────────────────────────────────── */
+.badge-priority-high   { background: #fee2e2; color: #b91c1c; }
+.badge-priority-medium { background: #fef9c3; color: #92400e; }
+.badge-priority-low    { background: #dcfce7; color: #15803d; }
+.todo-footer { flex-wrap: wrap; gap: 6px; }
+.todo-footer .todo-date { margin-right: auto; }
+
+.sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.sort-select {
+  padding: 6px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  background: white;
+}
+
+.edit-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  color: var(--text-muted);
+  margin-left: auto;
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.edit-btn:hover { color: var(--green); border-color: var(--green); }
+.todo-edit-actions { display: flex; gap: 8px; }
+.edit-cancel {
+  padding: 0 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-family: inherit;
+}
