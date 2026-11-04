@@ -575,3 +575,32 @@
   .todo-form     { padding: 18px; }
   .auth-card     { padding: 28px 20px; }
 }
+/* Password visibility toggle */
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrap .field-input {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
