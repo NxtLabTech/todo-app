@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
-import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+import { getAllTodos, createTodo, updateTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+import { PRIORITY_RANK } from '../utils/priority';
 
 export default function TodoPage() {
   const [todos,          setTodos]          = useState([]);
@@ -12,6 +13,7 @@ export default function TodoPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError,   setSummaryError]   = useState(null);
   const [showSummary,    setShowSummary]    = useState(false);
+  const [sortBy,         setSortBy]         = useState('priority');
   const navigate = useNavigate();
 
   const username = localStorage.getItem('username') || 'there';
@@ -42,8 +44,13 @@ export default function TodoPage() {
     navigate('/login', { replace: true });
   };
 
-  const handleCreate = async (title, description) => {
-    const { data } = await createTodo(title, description);
+  const handleUpdate = async (id, updates) => {
+    const { data } = await updateTodo(id, updates);
+    setTodos(prev => prev.map(t => t.id === id ? data : t));
+  };
+
+  const handleCreate = async (title, description, priority) => {
+    const { data } = await createTodo(title, description, priority);
     setTodos(prev => [data, ...prev]);
   };
 
@@ -77,6 +84,15 @@ export default function TodoPage() {
     setSummary(null);
     setSummaryError(null);
   };
+
+  // 'priority': high -> low, newest first within a level. 'newest': by created_at.
+  const sortedTodos = [...todos].sort((a, b) => {
+    if (sortBy === 'priority') {
+      const diff = (PRIORITY_RANK[a.priority] ?? 1) - (PRIORITY_RANK[b.priority] ?? 1);
+      if (diff !== 0) return diff;
+    }
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
 
   const completedCount = todos.filter(t => t.is_completed).length;
 
@@ -165,14 +181,30 @@ export default function TodoPage() {
           </div>
         )}
 
+        {!loading && !error && todos.length > 1 && (
+          <div className="sort-bar">
+            <label htmlFor="sort-by">Sort by</label>
+            <select
+              id="sort-by"
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="priority">Priority (high first)</option>
+              <option value="newest">Newest first</option>
+            </select>
+          </div>
+        )}
+
         {!loading && !error && (
           <ul className="todo-list">
-            {todos.map(todo => (
+            {sortedTodos.map(todo => (
               <li key={todo.id}>
                 <TodoCard
                   todo={todo}
                   onToggle={handleToggle}
                   onDelete={handleDelete}
+                  onUpdate={handleUpdate}
                 />
               </li>
             ))}

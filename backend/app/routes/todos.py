@@ -126,7 +126,7 @@ async def mark_complete(
     "/{todo_id}",
     response_model=TodoResponse,
     summary="Update a todo",
-    description="Updates title, description, or is_completed. Only the owner can update.",
+    description="Updates title, description, priority, or is_completed. Only the owner can update.",
 )
 async def update_todo(
     todo_id: str,
