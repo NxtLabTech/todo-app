@@ -5,29 +5,31 @@ import { registerUser } from '../api';
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 const PASSWORD_RULES = [
-  { id: 'len',   label: 'At least 8 characters',              test: (p) => p.length >= 8 },
-  { id: 'upper', label: 'At least 1 uppercase letter (A–Z)',  test: (p) => /[A-Z]/.test(p) },
-  { id: 'lower', label: 'At least 1 lowercase letter (a–z)',  test: (p) => /[a-z]/.test(p) },
-  { id: 'digit', label: 'At least 1 number (0–9)',            test: (p) => /[0-9]/.test(p) },
-  { id: 'spec',  label: 'At least 1 special character (!@#$%^&*)', test: (p) => /[!@#$%^&*]/.test(p) },
+  { id: 'len', label: 'At least 8 characters', test: (p) => p.length >= 8 },
+  { id: 'upper', label: 'At least 1 uppercase letter (A–Z)', test: (p) => /[A-Z]/.test(p) },
+  { id: 'lower', label: 'At least 1 lowercase letter (a–z)', test: (p) => /[a-z]/.test(p) },
+  { id: 'digit', label: 'At least 1 number (0–9)', test: (p) => /[0-9]/.test(p) },
+  { id: 'spec', label: 'At least 1 special character (!@#$%^&*)', test: (p) => /[!@#$%^&*]/.test(p) },
 ];
 
 function getStrength(password) {
   const passed = PASSWORD_RULES.filter(r => r.test(password)).length;
-  if (passed <= 2) return { label: 'Weak',   cls: 'strength--weak',   width: '33%' };
+  if (passed <= 2) return { label: 'Weak', cls: 'strength--weak', width: '33%' };
   if (passed <= 4) return { label: 'Medium', cls: 'strength--medium', width: '66%' };
-  return             { label: 'Strong',  cls: 'strength--strong', width: '100%' };
+  return { label: 'Strong', cls: 'strength--strong', width: '100%' };
 }
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
-  const [email,    setEmail]    = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm,  setConfirm]  = useState('');
-  const [errors,   setErrors]   = useState({});
+  const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [touched,  setTouched]  = useState({ password: false });
+  const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState({ password: false });
   const navigate = useNavigate();
 
   const strength = getStrength(password);
@@ -35,17 +37,17 @@ export default function RegisterPage() {
 
   const validate = () => {
     const e = {};
-    if (!username.trim())           e.username = 'Username is required.';
+    if (!username.trim()) e.username = 'Username is required.';
     else if (username.trim().length < 3) e.username = 'Username must be at least 3 characters.';
 
-    if (!email.trim())              e.email = 'Email is required.';
-    else if (!isValidEmail(email))  e.email = 'Enter a valid email (e.g. name@domain.com).';
+    if (!email.trim()) e.email = 'Email is required.';
+    else if (!isValidEmail(email)) e.email = 'Enter a valid email (e.g. name@domain.com).';
 
-    if (!password)                  e.password = 'Password is required.';
-    else if (!allRulesPassed)       e.password = 'Password does not meet all requirements.';
+    if (!password) e.password = 'Password is required.';
+    else if (!allRulesPassed) e.password = 'Password does not meet all requirements.';
 
-    if (!confirm)                   e.confirm = 'Please confirm your password.';
-    else if (confirm !== password)  e.confirm = 'Passwords do not match.';
+    if (!confirm) e.confirm = 'Please confirm your password.';
+    else if (confirm !== password) e.confirm = 'Passwords do not match.';
 
     return e;
   };
@@ -55,7 +57,10 @@ export default function RegisterPage() {
     setApiError('');
     setTouched({ password: true });
     const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
     setErrors({});
     setLoading(true);
     try {
@@ -63,7 +68,7 @@ export default function RegisterPage() {
       navigate('/login', { replace: true });
     } catch (err) {
       console.error('Register error status:', err.response?.status);
-      console.error('Register error data:',   err.response?.data);
+      console.error('Register error data:', err.response?.data);
       console.error('Register error message:', err.message);
 
       const data = err.response?.data;
@@ -129,23 +134,38 @@ export default function RegisterPage() {
           {/* Password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-password">Password</label>
-            <input
-              id="reg-password"
-              type="password"
-              className={`field-input ${errors.password ? 'field-input--err' : ''}`}
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setTouched(p => ({ ...p, password: true }));
-                clear('password');
-              }}
-              disabled={loading}
-              autoComplete="new-password"
-            />
+            <div className="password-input-wrap">
+              <input
+                id="reg-password"
+                type={showPassword ? 'text' : 'password'}
+                className={`field-input ${errors.password ? 'field-input--err' : ''}`}
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setTouched(p => ({ ...p, password: true }));
+                  clear('password');
+                }}
+                disabled={loading}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(prev => !prev)}
+                aria-label="Show or hide password"
+              >
+                <img
+                  src={showPassword ? "/eye-closed.png" : "/eye-open.png"}
+                  width="20"
+                  height="20"
+                  alt="Toggle password"
+                />
+              </button>
+            </div>
+
             {errors.password && <p className="field-error">✗ {errors.password}</p>}
 
-            {/* Strength bar — shown as soon as user starts typing */}
             {touched.password && password.length > 0 && (
               <div className="strength-wrap">
                 <div className="strength-bar">
@@ -160,7 +180,6 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Per-rule checklist */}
             {touched.password && (
               <ul className="rules-list">
                 {PASSWORD_RULES.map(rule => {
@@ -179,16 +198,34 @@ export default function RegisterPage() {
           {/* Confirm password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-confirm">Confirm password</label>
-            <input
-              id="reg-confirm"
-              type="password"
-              className={`field-input ${errors.confirm ? 'field-input--err' : ''}`}
-              placeholder="Re-enter your password"
-              value={confirm}
-              onChange={(e) => { setConfirm(e.target.value); clear('confirm'); }}
-              disabled={loading}
-              autoComplete="new-password"
-            />
+            <div className="password-input-wrap">
+              <input
+                id="reg-confirm"
+                type={showConfirmPassword ? 'text' : 'password'}
+                className={`field-input ${errors.confirm ? 'field-input--err' : ''}`}
+                placeholder="Re-enter your password"
+                value={confirm}
+                onChange={(e) => {
+                  setConfirm(e.target.value);
+                  clear('confirm');
+                }}
+                disabled={loading}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword(prev => !prev)}
+                aria-label="Show or hide confirm password"
+              >
+                <img
+                  src={showConfirmPassword ? "/eye-closed.png" : "/eye-open.png"}
+                  width="20"
+                  height="20"
+                  alt="Toggle password"
+                />
+              </button>
+            </div>
             {errors.confirm && <p className="field-error">✗ {errors.confirm}</p>}
           </div>
 

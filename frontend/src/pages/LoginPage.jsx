@@ -5,19 +5,20 @@ import { loginUser } from '../api';
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 export default function LoginPage() {
-  const [email,    setEmail]    = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors,   setErrors]   = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
     const e = {};
-    if (!email.trim())              e.email    = 'Email is required.';
-    else if (!isValidEmail(email))  e.email    = 'Enter a valid email (e.g. name@domain.com).';
-    if (!password)                  e.password = 'Password is required.';
-    else if (password.length < 8)   e.password = 'Password must be at least 8 characters.';
+    if (!email.trim()) e.email = 'Email is required.';
+    else if (!isValidEmail(email)) e.email = 'Enter a valid email (e.g. name@domain.com).';
+    if (!password) e.password = 'Password is required.';
+    else if (password.length < 8) e.password = 'Password must be at least 8 characters.';
     return e;
   };
 
@@ -25,18 +26,21 @@ export default function LoginPage() {
     e.preventDefault();
     setApiError('');
     const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
     setErrors({});
     setLoading(true);
     try {
       const { data } = await loginUser(email.trim(), password);
-      localStorage.setItem('token',    data.access_token);
+      localStorage.setItem('token', data.access_token);
       localStorage.setItem('username', data.user.full_name);
-      localStorage.setItem('email',    data.user.email);
+      localStorage.setItem('email', data.user.email);
       navigate('/', { replace: true });
     } catch (err) {
       console.error('Login error status:', err.response?.status);
-      console.error('Login error data:',   err.response?.data);
+      console.error('Login error data:', err.response?.data);
       console.error('Login error message:', err.message);
 
       setApiError(
@@ -72,7 +76,10 @@ export default function LoginPage() {
               className={`field-input ${errors.email ? 'field-input--err' : ''}`}
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => { setEmail(e.target.value); clear('email'); }}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clear('email');
+              }}
               disabled={loading}
               autoComplete="email"
               autoFocus
@@ -82,16 +89,37 @@ export default function LoginPage() {
 
           <div className="field-group">
             <label className="field-label" htmlFor="login-password">Password</label>
-            <input
-              id="login-password"
-              type="password"
-              className={`field-input ${errors.password ? 'field-input--err' : ''}`}
-              placeholder="Minimum 8 characters"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); clear('password'); }}
-              disabled={loading}
-              autoComplete="current-password"
-            />
+
+            <div className="password-input-wrap">
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                className={`field-input ${errors.password ? 'field-input--err' : ''}`}
+                placeholder="Minimum 8 characters"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clear('password');
+                }}
+                disabled={loading}
+                autoComplete="current-password"
+              />
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(prev => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                <img
+                  src={showPassword ? "/eye-closed.png" : "/eye-open.png"}
+                  width="20"
+                  height="20"
+                  alt=""
+                />
+              </button>
+            </div>
+
             {errors.password && <p className="field-error">✗ {errors.password}</p>}
           </div>
 
