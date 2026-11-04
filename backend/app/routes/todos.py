@@ -16,7 +16,7 @@ router = APIRouter()
     "/",
     response_model=list[TodoResponse],
     summary="List todos",
-    description="Returns all todos for the authenticated user, newest first.",
+    description="Returns todos ordered by priority (high to low), newest first within each priority.",
 )
 async def list_todos(
     current_user: CurrentUser = Depends(get_current_user),
@@ -126,7 +126,7 @@ async def mark_complete(
     "/{todo_id}",
     response_model=TodoResponse,
     summary="Update a todo",
-    description="Updates title, description, or is_completed. Only the owner can update.",
+    description="Updates title, description, completion status, or priority. Only the owner can update.",
 )
 async def update_todo(
     todo_id: str,

@@ -85,7 +85,17 @@ App available at: `http://localhost:5173`
 
 ## Supabase Tables
 
-**todos** — `id, title, description, is_completed, user_id, created_at, updated_at`
+**todos** — `id, title, description, is_completed, priority, user_id, created_at, updated_at`
+
+Before deploying the priority feature, run this in the Supabase SQL editor:
+
+```sql
+ALTER TABLE todos ADD COLUMN IF NOT EXISTS priority VARCHAR(10) NOT NULL DEFAULT 'medium';
+DO $$ BEGIN
+  ALTER TABLE todos ADD CONSTRAINT todos_priority_check CHECK (priority IN ('high', 'medium', 'low'));
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+```
 
 **profiles** — `id, full_name, avatar_url, created_at`
 
