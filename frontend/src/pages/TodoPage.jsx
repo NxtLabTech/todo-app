@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
-import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+import { getAllTodos, createTodo, updateTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+
+const sortByPriority = (items) => [...items].sort((a, b) => {
+  const order = { high: 0, medium: 1, low: 2 };
+  return (order[a.priority || 'medium'] - order[b.priority || 'medium']) || (new Date(b.created_at) - new Date(a.created_at));
+});
 
 export default function TodoPage() {
   const [todos,          setTodos]          = useState([]);
@@ -16,12 +21,19 @@ export default function TodoPage() {
 
   const username = localStorage.getItem('username') || 'there';
 
-  const fetchTodos = async () => {
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    navigate('/login', { replace: true });
+  }, [navigate]);
+
+  const fetchTodos = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const { data } = await getAllTodos();
-      setTodos(data);
+      setTodos(sortByPriority(data));
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         handleLogout();
@@ -31,20 +43,18 @@ export default function TodoPage() {
     } finally {
       setLoading(false);
     }
+  }, [handleLogout]);
+
+  useEffect(() => { queueMicrotask(fetchTodos); }, [fetchTodos]);
+
+  const handleCreate = async (title, description, priority) => {
+    const { data } = await createTodo(title, description, priority);
+    setTodos(prev => sortByPriority([...prev, data]));
   };
 
-  useEffect(() => { fetchTodos(); }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    navigate('/login', { replace: true });
-  };
-
-  const handleCreate = async (title, description) => {
-    const { data } = await createTodo(title, description);
-    setTodos(prev => [data, ...prev]);
+  const handleUpdate = async (id, fields) => {
+    const { data } = await updateTodo(id, fields);
+    setTodos(prev => sortByPriority(prev.map(todo => todo.id === id ? data : todo)));
   };
 
   const handleToggle = async (id) => {
@@ -173,6 +183,7 @@ export default function TodoPage() {
                   todo={todo}
                   onToggle={handleToggle}
                   onDelete={handleDelete}
+                  onUpdate={handleUpdate}
                 />
               </li>
             ))}

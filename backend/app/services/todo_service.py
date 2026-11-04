@@ -21,7 +21,11 @@ class TodoService:
             )
 
         result = await asyncio.to_thread(_query)
-        return result.data or []
+        priority_order = {"high": 0, "medium": 1, "low": 2}
+        return sorted(
+            result.data or [],
+            key=lambda todo: priority_order.get(todo.get("priority", "medium"), 1),
+        )
 
     async def get_todo(self, todo_id: str) -> Optional[dict[str, Any]]:
         def _query() -> Any:
@@ -47,6 +51,7 @@ class TodoService:
                         "title": data.title,
                         "description": data.description,
                         "is_completed": False,
+                        "priority": data.priority,
                         "user_id": user_id,
                         "created_at": now,
                         "updated_at": now,

@@ -15,9 +15,15 @@ const formatDate = (dateStr) => {
   }
 };
 
-export default function TodoCard({ todo, onToggle, onDelete }) {
+export default function TodoCard({ todo, onToggle, onDelete, onUpdate }) {
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [title, setTitle] = useState(todo.title);
+  const [description, setDescription] = useState(todo.description || '');
+  const [priorityDraft, setPriorityDraft] = useState(todo.priority || 'medium');
+  const priority = todo.priority || 'medium';
 
   const handleToggle = async () => {
     setToggling(true);
@@ -38,9 +44,43 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
     }
   };
 
+  const handleSave = async (event) => {
+    event.preventDefault();
+    if (!title.trim()) return;
+    setSaving(true);
+    try {
+      await onUpdate(todo.id, { title: title.trim(), description: description.trim(), priority: priorityDraft });
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const startEditing = () => {
+    setTitle(todo.title);
+    setDescription(todo.description || '');
+    setPriorityDraft(todo.priority || 'medium');
+    setEditing(true);
+  };
+
   return (
     <div className={`todo-card ${todo.is_completed ? 'completed' : ''}`}>
-      {/* Top row: checkbox + title + delete */}
+      {editing ? (
+        <form className="todo-edit-form" onSubmit={handleSave}>
+          <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} maxLength={255} required aria-label="Todo title" />
+          <input className="form-input" value={description} onChange={e => setDescription(e.target.value)} maxLength={1000} placeholder="Description" aria-label="Todo description" />
+          <label className="priority-field">Priority
+            <select className="form-input" value={priorityDraft} onChange={e => setPriorityDraft(e.target.value)} aria-label="Priority">
+              <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
+            </select>
+          </label>
+          <div className="todo-edit-actions">
+            <button className="btn btn-primary btn-sm" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+            <button className="btn btn-outline btn-sm" type="button" onClick={() => setEditing(false)} disabled={saving}>Cancel</button>
+          </div>
+        </form>
+      ) : <>
+      {/* Top row: checkbox + title + actions */}
       <div className="todo-card-top">
         <div className="todo-left">
           <input
@@ -56,6 +96,7 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
           </span>
         </div>
 
+        <button className="btn btn-outline btn-sm" onClick={startEditing} aria-label="Edit todo">Edit</button>
         <button
           className="delete-btn"
           onClick={handleDelete}
@@ -80,7 +121,9 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
         <span className={`todo-badge ${todo.is_completed ? 'badge-done' : 'badge-pending'}`}>
           {todo.is_completed ? 'Completed' : 'Pending'}
         </span>
+        <span className={`priority-badge priority-${priority}`}>{priority} priority</span>
       </div>
+      </>}
     </div>
   );
 }

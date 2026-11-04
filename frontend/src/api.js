@@ -16,7 +16,7 @@ export const registerUser = (username, email, password)  =>
 const T = `${API}/todos/`;
 
 export const getAllTodos     = ()                  => axios.get(T, auth());
-export const createTodo     = (title, description)=> axios.post(T, { title, description }, auth());
+export const createTodo     = (title, description, priority = 'medium')=> axios.post(T, { title, description, priority }, auth());
 export const updateTodo     = (id, data)          => axios.patch(`${API}/todos/${id}`, data, auth());
 export const toggleComplete = (id)                => axios.patch(`${API}/todos/${id}/complete`, {}, auth());
 export const deleteTodo     = (id)                => axios.delete(`${API}/todos/${id}`, auth());
