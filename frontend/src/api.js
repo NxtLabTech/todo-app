@@ -21,3 +21,11 @@ export const updateTodo     = (id, data)          => axios.patch(`${API}/todos/$
 export const toggleComplete = (id)                => axios.patch(`${API}/todos/${id}/complete`, {}, auth());
 export const deleteTodo     = (id)                => axios.delete(`${API}/todos/${id}`, auth());
 export const summarizeTodos = ()                  => axios.post(`${API}/todos/summarize`, {}, auth());
+export const breakdownTodo   = (id)                => axios.post(`${API}/todos/${id}/breakdown`, {}, auth());
+export const toggleSubtask   = (todoId, subtaskId, isCompleted) =>
+  axios.patch(`${API}/todos/${todoId}/subtasks/${subtaskId}`, { is_completed: isCompleted }, auth());
+export const addSubtask      = (todoId, title)     =>
+  axios.post(`${API}/todos/${todoId}/subtasks`, { title }, auth());
+export const deleteSubtask   = (todoId, subtaskId) =>
+  axios.delete(`${API}/todos/${todoId}/subtasks/${subtaskId}`, auth());
+

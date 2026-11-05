@@ -3,7 +3,14 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.middleware.auth_middleware import get_current_user
-from app.models.todo_model import SummarizeResponse, TodoCreate, TodoResponse, TodoUpdate
+from app.models.todo_model import (
+    SubtaskCreate,
+    SubtaskUpdate,
+    SummarizeResponse,
+    TodoCreate,
+    TodoResponse,
+    TodoUpdate,
+)
 from app.models.user_model import CurrentUser
 from app.services.ai_service import ai_service
 from app.services.todo_service import todo_service
@@ -178,3 +185,145 @@ async def delete_todo(
     except Exception as exc:
         logger.error("Failed to delete todo: %s", exc)
         raise HTTPException(status_code=500, detail="Failed to delete todo")
+
+
+@router.post(
+    "/{todo_id}/breakdown",
+    response_model=TodoResponse,
+    summary="AI task breakdown",
+    description="Uses Gemini AI to break down a todo into actionable subtasks.",
+)
+async def breakdown_todo(
+    todo_id: str,
+    current_user: CurrentUser = Depends(get_current_user),
+) -> TodoResponse:
+    try:
+        todo = await todo_service.get_todo(todo_id)
+    except Exception as exc:
+        logger.error("Failed to fetch todo: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to fetch todo")
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    if todo["user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    try:
+        subtask_titles = await ai_service.decompose_task(
+            title=todo["title"],
+            description=todo.get("description"),
+        )
+        updated = await todo_service.set_ai_subtasks(todo_id, subtask_titles)
+        return TodoResponse.model_validate(updated)
+    except RuntimeError as exc:
+        logger.error("AI service error: %s", exc)
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Failed to break down todo: %s", exc)
+        msg = str(exc).lower()
+        if "subtasks" in msg or "column" in msg:
+            raise HTTPException(
+                status_code=500,
+                detail="Database 'subtasks' column not found. Please run the SQL migration in Supabase.",
+            )
+        raise HTTPException(status_code=500, detail="Could not break down task. Please try again.")
+
+
+@router.patch(
+    "/{todo_id}/subtasks/{subtask_id}",
+    response_model=TodoResponse,
+    summary="Update subtask",
+    description="Toggles subtask completion status or updates title.",
+)
+async def update_subtask(
+    todo_id: str,
+    subtask_id: str,
+    data: SubtaskUpdate,
+    current_user: CurrentUser = Depends(get_current_user),
+) -> TodoResponse:
+    try:
+        todo = await todo_service.get_todo(todo_id)
+    except Exception as exc:
+        logger.error("Failed to fetch todo: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to fetch todo")
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    if todo["user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    try:
+        updated = await todo_service.update_subtask(
+            todo_id=todo_id,
+            subtask_id=subtask_id,
+            is_completed=data.is_completed,
+            title=data.title,
+        )
+        return TodoResponse.model_validate(updated)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except Exception as exc:
+        logger.error("Failed to update subtask: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to update subtask")
+
+
+@router.post(
+    "/{todo_id}/subtasks",
+    response_model=TodoResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add a subtask",
+    description="Adds a subtask to an existing todo.",
+)
+async def add_subtask(
+    todo_id: str,
+    data: SubtaskCreate,
+    current_user: CurrentUser = Depends(get_current_user),
+) -> TodoResponse:
+    try:
+        todo = await todo_service.get_todo(todo_id)
+    except Exception as exc:
+        logger.error("Failed to fetch todo: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to fetch todo")
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    if todo["user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    try:
+        updated = await todo_service.add_subtask(todo_id=todo_id, title=data.title)
+        return TodoResponse.model_validate(updated)
+    except Exception as exc:
+        logger.error("Failed to add subtask: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to add subtask")
+
+
+@router.delete(
+    "/{todo_id}/subtasks/{subtask_id}",
+    response_model=TodoResponse,
+    summary="Delete a subtask",
+    description="Deletes a subtask from an existing todo.",
+)
+async def delete_subtask(
+    todo_id: str,
+    subtask_id: str,
+    current_user: CurrentUser = Depends(get_current_user),
+) -> TodoResponse:
+    try:
+        todo = await todo_service.get_todo(todo_id)
+    except Exception as exc:
+        logger.error("Failed to fetch todo: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to fetch todo")
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    if todo["user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    try:
+        updated = await todo_service.delete_subtask(todo_id=todo_id, subtask_id=subtask_id)
+        return TodoResponse.model_validate(updated)
+    except Exception as exc:
+        logger.error("Failed to delete subtask: %s", exc)
+        raise HTTPException(status_code=500, detail="Failed to delete subtask")
+

@@ -39,9 +39,48 @@ export function useTodos() {
   };
 
   const toggleTodo = async (todo) => {
-    const { data } = await todosAPI.update(todo.id, { completed: !todo.completed });
+    const { data } = await todosAPI.update(todo.id, { is_completed: !todo.is_completed });
     setTodos((prev) => prev.map((t) => (t.id === todo.id ? data : t)));
   };
 
-  return { todos, loading, fetchTodos, createTodo, updateTodo, deleteTodo, toggleTodo };
+  const breakdownTodo = async (id) => {
+    const { data } = await todosAPI.breakdown(id);
+    setTodos((prev) => prev.map((t) => (t.id === id ? data : t)));
+    toast.success('Task broken down into steps!');
+    return data;
+  };
+
+  const toggleSubtask = async (todoId, subtaskId, isCompleted) => {
+    const { data } = await todosAPI.toggleSubtask(todoId, subtaskId, isCompleted);
+    setTodos((prev) => prev.map((t) => (t.id === todoId ? data : t)));
+    return data;
+  };
+
+  const addSubtask = async (todoId, title) => {
+    const { data } = await todosAPI.addSubtask(todoId, title);
+    setTodos((prev) => prev.map((t) => (t.id === todoId ? data : t)));
+    toast.success('Step added!');
+    return data;
+  };
+
+  const deleteSubtask = async (todoId, subtaskId) => {
+    const { data } = await todosAPI.deleteSubtask(todoId, subtaskId);
+    setTodos((prev) => prev.map((t) => (t.id === todoId ? data : t)));
+    toast.success('Step removed!');
+    return data;
+  };
+
+  return {
+    todos,
+    loading,
+    fetchTodos,
+    createTodo,
+    updateTodo,
+    deleteTodo,
+    toggleTodo,
+    breakdownTodo,
+    toggleSubtask,
+    addSubtask,
+    deleteSubtask,
+  };
 }
