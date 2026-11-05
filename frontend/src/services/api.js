@@ -51,6 +51,18 @@ export const todosAPI = {
 
   delete: (todo_id) =>
     api.delete(`/todos/${todo_id}`),
+
+  breakdown: (todo_id) =>
+    api.post(`/todos/${todo_id}/breakdown`),
+
+  toggleSubtask: (todo_id, subtask_id, is_completed) =>
+    api.patch(`/todos/${todo_id}/subtasks/${subtask_id}`, { is_completed }),
+
+  addSubtask: (todo_id, title) =>
+    api.post(`/todos/${todo_id}/subtasks`, { title }),
+
+  deleteSubtask: (todo_id, subtask_id) =>
+    api.delete(`/todos/${todo_id}/subtasks/${subtask_id}`),
 };
 
 export default api;

@@ -1,8 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
-import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+import {
+  getAllTodos,
+  createTodo,
+  toggleComplete,
+  deleteTodo,
+  summarizeTodos,
+  breakdownTodo,
+  toggleSubtask,
+  addSubtask,
+  deleteSubtask,
+} from '../api';
 
 export default function TodoPage() {
   const [todos,          setTodos]          = useState([]);
@@ -16,7 +26,14 @@ export default function TodoPage() {
 
   const username = localStorage.getItem('username') || 'there';
 
-  const fetchTodos = async () => {
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    navigate('/login', { replace: true });
+  }, [navigate]);
+
+  const fetchTodos = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -31,16 +48,12 @@ export default function TodoPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [handleLogout]);
 
-  useEffect(() => { fetchTodos(); }, []);
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    navigate('/login', { replace: true });
-  };
 
   const handleCreate = async (title, description) => {
     const { data } = await createTodo(title, description);
@@ -55,6 +68,30 @@ export default function TodoPage() {
   const handleDelete = async (id) => {
     await deleteTodo(id);
     setTodos(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleBreakdown = async (id) => {
+    const { data } = await breakdownTodo(id);
+    setTodos(prev => prev.map(t => (t.id === id ? data : t)));
+    return data;
+  };
+
+  const handleToggleSubtask = async (todoId, subtaskId, isCompleted) => {
+    const { data } = await toggleSubtask(todoId, subtaskId, isCompleted);
+    setTodos(prev => prev.map(t => (t.id === todoId ? data : t)));
+    return data;
+  };
+
+  const handleAddSubtask = async (todoId, title) => {
+    const { data } = await addSubtask(todoId, title);
+    setTodos(prev => prev.map(t => (t.id === todoId ? data : t)));
+    return data;
+  };
+
+  const handleDeleteSubtask = async (todoId, subtaskId) => {
+    const { data } = await deleteSubtask(todoId, subtaskId);
+    setTodos(prev => prev.map(t => (t.id === todoId ? data : t)));
+    return data;
   };
 
   const handleSummarize = async () => {
@@ -173,6 +210,10 @@ export default function TodoPage() {
                   todo={todo}
                   onToggle={handleToggle}
                   onDelete={handleDelete}
+                  onBreakdown={handleBreakdown}
+                  onToggleSubtask={handleToggleSubtask}
+                  onAddSubtask={handleAddSubtask}
+                  onDeleteSubtask={handleDeleteSubtask}
                 />
               </li>
             ))}
