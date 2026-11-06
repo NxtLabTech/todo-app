@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ConfirmModal from './ConfirmModal';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -18,6 +19,7 @@ const formatDate = (dateStr) => {
 export default function TodoCard({ todo, onToggle, onDelete }) {
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleToggle = async () => {
     setToggling(true);
@@ -28,13 +30,13 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm(`Delete "${todo.title}"?`)) return;
+  const handleConfirmDelete = async () => {
     setDeleting(true);
     try {
       await onDelete(todo.id);
     } catch {
       setDeleting(false);
+      setShowConfirm(false);
     }
   };
 
@@ -58,7 +60,7 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
 
         <button
           className="delete-btn"
-          onClick={handleDelete}
+          onClick={() => setShowConfirm(true)}
           disabled={deleting}
           title="Delete todo"
           aria-label="Delete todo"
@@ -81,6 +83,14 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
           {todo.is_completed ? 'Completed' : 'Pending'}
         </span>
       </div>
+
+      {showConfirm && (
+        <ConfirmModal
+          loading={deleting}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </div>
   );
 }
