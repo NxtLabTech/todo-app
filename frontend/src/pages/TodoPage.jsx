@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
-import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
+import { getAllTodos, createTodo, setTodoCompletion, deleteTodo, summarizeTodos } from '../api';
 
 export default function TodoPage() {
   const [todos,          setTodos]          = useState([]);
@@ -47,10 +47,10 @@ export default function TodoPage() {
     setTodos(prev => [data, ...prev]);
   };
 
-  const handleToggle = async (id) => {
-    const { data } = await toggleComplete(id);
-    setTodos(prev => prev.map(t => t.id === id ? data : t));
-  };
+  const handleToggle = async (id, isCompleted) => {
+  const { data } = await setTodoCompletion(id, isCompleted);
+  setTodos(prev => prev.map(t => t.id === id ? data : t));
+};
 
   const handleDelete = async (id) => {
     await deleteTodo(id);
