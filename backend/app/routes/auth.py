@@ -125,7 +125,10 @@ async def login(data: LoginRequest) -> LoginResponse:
         print(f"[LOGIN] HTTPStatusError {status}: {exc.response.text}")
         logger.error("Login HTTP error %s: %s", status, exc.response.text)
         if status in (400, 401):
-            raise HTTPException(status_code=401, detail="Invalid email or password")
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password. Please check and try again.",
+            )
         raise HTTPException(status_code=500, detail=f"Login failed: Supabase returned {status}")
     except Exception as exc:
         print(f"[LOGIN] EXCEPTION type : {type(exc).__name__}")
@@ -140,7 +143,10 @@ async def login(data: LoginRequest) -> LoginResponse:
     email: str = user_obj.get("email", data.email)
 
     if not access_token or not user_id:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password. Please check and try again.",
+        )
 
     try:
         profile_res = await asyncio.to_thread(

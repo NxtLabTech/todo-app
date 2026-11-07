@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
+import LogoutConfirmModal from './LogoutConfirmModal';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -23,10 +26,16 @@ export default function Navbar() {
       <span className="navbar-brand">✅ TodoApp</span>
       <div className="navbar-right">
         {user && <span className="navbar-user">Hello, {user.name}</span>}
-        <button className="btn btn-outline" onClick={handleLogout}>
+        <button className="btn btn-outline" onClick={() => setShowLogoutConfirm(true)}>
           Logout
         </button>
       </div>
+      {showLogoutConfirm && (
+        <LogoutConfirmModal
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
     </nav>
   );
 }

@@ -70,22 +70,22 @@ App available at: `http://localhost:5173`
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Health check |
-| POST | `/auth/register` | Register new user |
-| POST | `/auth/login` | Login user |
-| POST | `/auth/logout` | Logout user |
-| GET | `/auth/me` | Get current user |
-| GET | `/todos/` | Get all todos |
-| POST | `/todos/` | Create todo |
-| PATCH | `/todos/{id}` | Update todo |
-| PATCH | `/todos/{id}/complete` | Mark todo complete |
-| DELETE | `/todos/{id}` | Delete todo |
+| Method | Endpoint               | Description        |
+| ------ | ---------------------- | ------------------ |
+| GET    | `/health`              | Health check       |
+| POST   | `/auth/register`       | Register new user  |
+| POST   | `/auth/login`          | Login user         |
+| POST   | `/auth/logout`         | Logout user        |
+| GET    | `/auth/me`             | Get current user   |
+| GET    | `/todos/`              | Get all todos      |
+| POST   | `/todos/`              | Create todo        |
+| PATCH  | `/todos/{id}`          | Update todo        |
+| PATCH  | `/todos/{id}/complete` | Mark todo complete |
+| DELETE | `/todos/{id}`          | Delete todo        |
 
 ## Supabase Tables
 
-**todos** — `id, title, description, is_completed, user_id, created_at, updated_at`
+**todos** — `id, title, description, priority, due_date, is_completed, user_id, created_at, updated_at`
 
 **profiles** — `id, full_name, avatar_url, created_at`
 
