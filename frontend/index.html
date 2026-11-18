@@ -7,6 +7,24 @@
     <title>todo-frontend</title>
   </head>
   <body>
+    <script>
+      let prefersDark = false;
+      try {
+        prefersDark = typeof window.matchMedia === 'function'
+          && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch {
+        prefersDark = false;
+      }
+
+      let theme = prefersDark ? 'dark' : 'light';
+      try {
+        const savedTheme = localStorage.getItem('todo-theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') theme = savedTheme;
+      } catch {
+        theme = prefersDark ? 'dark' : 'light';
+      }
+      if (theme === 'dark') document.body.classList.add('theme-dark');
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
