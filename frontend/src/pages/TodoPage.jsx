@@ -4,7 +4,7 @@ import TodoForm from '../components/TodoForm';
 import TodoCard from '../components/TodoCard';
 import { getAllTodos, createTodo, toggleComplete, deleteTodo, summarizeTodos } from '../api';
 
-export default function TodoPage() {
+export default function TodoPage({ theme, onThemeToggle }) {
   const [todos,          setTodos]          = useState([]);
   const [loading,        setLoading]        = useState(true);
   const [error,          setError]          = useState(null);
@@ -89,9 +89,21 @@ export default function TodoPage() {
             <h1 className="header-title">My Todo List</h1>
             <p className="header-sub">Welcome back, {username}!</p>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="header-actions">
+            <button
+              className="header-theme-toggle"
+              type="button"
+              onClick={onThemeToggle}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              aria-pressed={theme === 'dark'}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+            </button>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

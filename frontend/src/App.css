@@ -575,3 +575,188 @@
   .todo-form     { padding: 18px; }
   .auth-card     { padding: 28px 20px; }
 }
+
+/* ─── Theme control ──────────────────────────────────────── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.header-theme-toggle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.4);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+
+.header-theme-toggle:hover {
+  background: rgba(255,255,255,.3);
+  transform: translateY(-1px);
+}
+
+.header-theme-toggle:active {
+  transform: scale(.96);
+}
+
+.header-theme-toggle:focus-visible,
+.logout-btn:focus-visible,
+.form-submit:focus-visible,
+.auth-btn:focus-visible,
+.retry-btn:focus-visible,
+.delete-btn:focus-visible,
+.ai-summary-close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ─── Dark theme ────────────────────────────────────────── */
+body.theme-dark {
+  color-scheme: dark;
+  --green-light: #1b3325;
+  --green-border: #315b3c;
+  --green-mid: #55b77a;
+  --white: #19231d;
+  --text: #e7efe9;
+  --text-muted: #a3b0a7;
+  --border: #34443a;
+  --danger: #ff9188;
+  --danger-light: #351f20;
+  --danger-border: #684041;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.24), 0 1px 2px rgba(0,0,0,.18);
+  --shadow: 0 4px 14px rgba(0,0,0,.28), 0 2px 4px rgba(0,0,0,.2);
+  background: #101713;
+  color: var(--text);
+}
+
+body.theme-dark .auth-page {
+  background: linear-gradient(145deg, #101713 0%, #14221a 55%, #1a3021 100%);
+}
+
+body.theme-dark .auth-card {
+  background: #19231d;
+  border-color: #315b3c;
+}
+
+body.theme-dark .form-input,
+body.theme-dark .field-input {
+  color: var(--text);
+  background: #131c16;
+  border-color: var(--border);
+}
+
+body.theme-dark .form-input:disabled,
+body.theme-dark .field-input:disabled {
+  background: #202c24;
+}
+
+body.theme-dark .form-input::placeholder,
+body.theme-dark .field-input::placeholder {
+  color: #91a096;
+}
+
+body.theme-dark .todo-card.completed {
+  background: #1b3325;
+  border-color: #315b3c;
+}
+
+body.theme-dark .todo-checkbox {
+  background: #131c16;
+  border-color: #607066;
+}
+
+body.theme-dark .todo-date,
+body.theme-dark .empty-hint {
+  color: #a3b0a7;
+}
+
+body.theme-dark .badge-done {
+  background: #21452d;
+  color: #a7f3bd;
+}
+
+body.theme-dark .badge-pending {
+  background: #44351c;
+  color: #fcd879;
+}
+
+body.theme-dark .stats-todo,
+body.theme-dark .strength-label.strength--medium {
+  color: #fcd879;
+}
+
+body.theme-dark .todo-form-heading,
+body.theme-dark .section-label--done,
+body.theme-dark .rule--pass,
+body.theme-dark .strength-label.strength--strong {
+  color: #a7f3bd;
+}
+
+body.theme-dark .auth-api-error {
+  background: #351f20;
+  border-color: #684041;
+}
+
+body.theme-dark .rules-list {
+  background: #1b3325;
+  border-color: #315b3c;
+}
+
+body.theme-dark .rule-icon {
+  color: #91a096;
+}
+
+body.theme-dark .ai-summary-card {
+  background: linear-gradient(135deg, #251d35, #302342);
+  border-color: #594274;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+
+body.theme-dark .ai-summary-title {
+  color: #d8b4fe;
+}
+
+body.theme-dark .ai-summary-text {
+  color: #eee7f6;
+}
+
+body.theme-dark .ai-summary-close {
+  color: #c4b8d1;
+}
+
+body.theme-dark .ai-summary-close:hover {
+  color: #fff;
+  background: rgba(255,255,255,.1);
+}
+
+body.theme-dark .ai-summary-error {
+  color: #ffaaa3;
+}
+
+body.theme-dark .field-input:focus,
+body.theme-dark .form-input:focus {
+  box-shadow: 0 0 0 3px rgba(74,222,128,.18);
+}
+
+@media (max-width: 480px) {
+  .header-inner {
+    gap: 12px;
+  }
+
+  .header-actions {
+    gap: 7px;
+  }
+
+  .logout-btn {
+    padding: 8px 12px;
+  }
+}
