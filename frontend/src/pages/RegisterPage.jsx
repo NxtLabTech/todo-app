@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
+import PasswordInput from '../components/PasswordInput';
 
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
@@ -129,20 +130,19 @@ export default function RegisterPage() {
           {/* Password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-password">Password</label>
-            <input
-              id="reg-password"
-              type="password"
-              className={`field-input ${errors.password ? 'field-input--err' : ''}`}
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setTouched(p => ({ ...p, password: true }));
-                clear('password');
-              }}
-              disabled={loading}
-              autoComplete="new-password"
-            />
+            <PasswordInput
+  id="reg-password"
+  className={`field-input ${errors.password ? 'field-input--err' : ''}`}
+  placeholder="Create a strong password"
+  value={password}
+  onChange={(e) => {
+    setPassword(e.target.value);
+    setTouched(p => ({ ...p, password: true }));
+    clear('password');
+  }}
+  disabled={loading}
+  autoComplete="new-password"
+/>
             {errors.password && <p className="field-error">✗ {errors.password}</p>}
 
             {/* Strength bar — shown as soon as user starts typing */}
@@ -179,16 +179,18 @@ export default function RegisterPage() {
           {/* Confirm password */}
           <div className="field-group">
             <label className="field-label" htmlFor="reg-confirm">Confirm password</label>
-            <input
-              id="reg-confirm"
-              type="password"
-              className={`field-input ${errors.confirm ? 'field-input--err' : ''}`}
-              placeholder="Re-enter your password"
-              value={confirm}
-              onChange={(e) => { setConfirm(e.target.value); clear('confirm'); }}
-              disabled={loading}
-              autoComplete="new-password"
-            />
+            <PasswordInput
+  id="reg-confirm"
+  className={`field-input ${errors.confirm ? 'field-input--err' : ''}`}
+  placeholder="Re-enter your password"
+  value={confirm}
+  onChange={(e) => {
+    setConfirm(e.target.value);
+    clear('confirm');
+  }}
+  disabled={loading}
+  autoComplete="new-password"
+/>
             {errors.confirm && <p className="field-error">✗ {errors.confirm}</p>}
           </div>
 
