@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../api';
+import PasswordInput from '../components/PasswordInput';
 
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
@@ -82,16 +83,18 @@ export default function LoginPage() {
 
           <div className="field-group">
             <label className="field-label" htmlFor="login-password">Password</label>
-            <input
-              id="login-password"
-              type="password"
-              className={`field-input ${errors.password ? 'field-input--err' : ''}`}
-              placeholder="Minimum 8 characters"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); clear('password'); }}
-              disabled={loading}
-              autoComplete="current-password"
-            />
+           <PasswordInput
+  id="login-password"
+  className={`field-input ${errors.password ? 'field-input--err' : ''}`}
+  placeholder="Minimum 8 characters"
+  value={password}
+  onChange={(e) => {
+    setPassword(e.target.value);
+    clear('password');
+  }}
+  disabled={loading}
+  autoComplete="current-password"
+/>
             {errors.password && <p className="field-error">✗ {errors.password}</p>}
           </div>
 
