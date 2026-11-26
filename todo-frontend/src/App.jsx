@@ -17,7 +17,6 @@ export default function App() {
     checkHealth();
   }, []);
 
-
   return (
     <BrowserRouter>
       <Routes>
@@ -33,4 +32,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-

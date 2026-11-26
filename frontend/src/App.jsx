@@ -6,7 +6,6 @@ import TodoPage     from './pages/TodoPage';
 import { checkHealth } from './api';
 import './App.css';
 
-
 function ProtectedRoute({ children }) {
   return localStorage.getItem('token')
     ? children
@@ -17,7 +16,6 @@ export default function App() {
   useEffect(() => {
     checkHealth();
   }, []);
-
 
   return (
     <BrowserRouter>
@@ -34,4 +32,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
