@@ -29,7 +29,6 @@ export default function TodoForm({ onSubmit }) {
     }
   };
 
-
   return (
     <form className="todo-form" onSubmit={handleSubmit}>
       <h2 className="todo-form-heading">

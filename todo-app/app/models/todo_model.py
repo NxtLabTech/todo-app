@@ -19,7 +19,6 @@ class TodoCreate(BaseModel):
                 raise ValueError("Title cannot be empty")
         return v
 
-
     @field_validator("description", mode="before")
     @classmethod
     def sanitize_description(cls, v: Optional[str]) -> Optional[str]:
@@ -41,7 +40,6 @@ class TodoUpdate(BaseModel):
             if not v:
                 raise ValueError("Title cannot be empty")
         return v
-
 
     @field_validator("description", mode="before")
     @classmethod
@@ -77,4 +75,3 @@ class TodoResponse(BaseModel):
 
 class SummarizeResponse(BaseModel):
     summary: str
-
