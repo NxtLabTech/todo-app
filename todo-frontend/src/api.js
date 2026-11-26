@@ -12,6 +12,10 @@ export const loginUser    = (email, password)            =>
 export const registerUser = (username, email, password)  =>
   axios.post(`${API}/auth/register`, { full_name: username, email, password });
 
+// ── System ────────────────────────────────────────────────────
+export const checkHealth  = ()                           =>
+  axios.get(`${API}/health`).catch(() => {});
+
 // ── Todos (all require JWT) ───────────────────────────────────
 const T = `${API}/todos/`;
 
