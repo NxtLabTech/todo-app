@@ -22,7 +22,7 @@ export default function TodoCard({ todo, onToggle, onDelete }) {
   const handleToggle = async () => {
     setToggling(true);
     try {
-      await onToggle(todo.id);
+      await onToggle(todo.id, !todo.is_completed);
     } finally {
       setToggling(false);
     }
