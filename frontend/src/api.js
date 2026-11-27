@@ -25,3 +25,7 @@ export const setTodoCompletion = (id, isCompleted) =>
   axios.patch(`${API}/todos/${id}`, { is_completed: isCompleted }, auth());
 
 export const deleteTodo = (id) => axios.delete(`${API}/todos/${id}`, auth());
+
+
+export const summarizeTodos = () =>
+  axios.post(`${API}/todos/summarize`, {}, auth());
