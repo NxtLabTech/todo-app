@@ -12,6 +12,8 @@ export default function TodoPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError,   setSummaryError]   = useState(null);
   const [showSummary,    setShowSummary]    = useState(false);
+  const [searchTerm,     setSearchTerm]     = useState('');
+  const [activeFilter,   setActiveFilter]   = useState('all');
   const navigate = useNavigate();
 
   const username = localStorage.getItem('username') || 'there';
@@ -79,6 +81,19 @@ export default function TodoPage() {
   };
 
   const completedCount = todos.filter(t => t.is_completed).length;
+  const pendingCount = todos.length - completedCount;
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredTodos = todos.filter(todo => {
+    const matchesSearch = [
+      todo.title,
+      todo.description || '',
+    ].some(value => value.toLowerCase().includes(normalizedSearchTerm));
+    const matchesFilter = activeFilter === 'all'
+      || (activeFilter === 'pending' && !todo.is_completed)
+      || (activeFilter === 'completed' && todo.is_completed);
+
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div>
@@ -165,9 +180,47 @@ export default function TodoPage() {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && todos.length > 0 && (
+          <section className="todo-filters" aria-label="Search and filter todos">
+            <label className="todo-search-label" htmlFor="todo-search">Search todos</label>
+            <input
+              id="todo-search"
+              className="todo-search"
+              type="search"
+              value={searchTerm}
+              onChange={event => setSearchTerm(event.target.value)}
+              placeholder="Search by title or description..."
+            />
+            <div className="todo-filter-buttons" aria-label="Filter todos by status">
+              {[
+                { id: 'all', label: 'All', count: todos.length },
+                { id: 'pending', label: 'Pending', count: pendingCount },
+                { id: 'completed', label: 'Completed', count: completedCount },
+              ].map(filter => (
+                <button
+                  key={filter.id}
+                  className={`todo-filter-button${activeFilter === filter.id ? ' active' : ''}`}
+                  type="button"
+                  aria-pressed={activeFilter === filter.id}
+                  onClick={() => setActiveFilter(filter.id)}
+                >
+                  {filter.label} ({filter.count})
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!loading && !error && todos.length > 0 && filteredTodos.length === 0 && (
+          <div className="empty-state todo-no-results" role="status">
+            <p className="empty-text">No results found</p>
+            <p className="empty-hint">Try a different search or filter.</p>
+          </div>
+        )}
+
+        {!loading && !error && filteredTodos.length > 0 && (
           <ul className="todo-list">
-            {todos.map(todo => (
+            {filteredTodos.map(todo => (
               <li key={todo.id}>
                 <TodoCard
                   todo={todo}
